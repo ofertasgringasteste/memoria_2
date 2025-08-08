@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Facebook Ads Tracking - Brain Song</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1478137953324470 0%, #1a1a1a 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            border-left: 4px solid #1478137953324470;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            color: #333;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #1478137953324470;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .charts-section {
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .chart-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .events-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .events-table th,
+        .events-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .events-table th {
+            background: #1478137953324470;
+            color: white;
+            font-weight: 600;
+        }
+
+        .events-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .events-table tr:hover {
+            background: #e9ecef;
+        }
+
+        .page-tabs {
+            display: flex;
+            background: #e9ecef;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .page-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            border: none;
+            background: transparent;
+            font-size: 1em;
+            font-weight: 500;
+        }
+
+        .page-tab.active {
+            background: #1478137953324470;
+            color: white;
+        }
+
+        .page-tab:hover:not(.active) {
+            background: #dee2e6;
+        }
+
+        .conversion-funnel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .funnel-step {
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .funnel-step:not(:last-child)::after {
+            content: '→';
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5em;
+            color: #1478137953324470;
+        }
+
+        .funnel-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #1478137953324470;
+        }
+
+        .funnel-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .refresh-btn {
+            background: #1478137953324470;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 20px;
+            transition: background 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #0d5a0d;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-active {
+            background: #28a745;
+        }
+
+        .status-inactive {
+            background: #dc3545;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .conversion-funnel {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .funnel-step:not(:last-child)::after {
+                content: '↓';
+                position: static;
+                transform: none;
+                display: block;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>📊 Dashboard Facebook Ads Tracking</h1>
+            <p>Brain Song - Sistema de Rastreamento Avançado</p>
+            <div style="margin-top: 15px;">
+                <span class="status-indicator status-active"></span>
+                <span>Pixel ID: 1478137953324470</span>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Visualizações de Página</h3>
+                <div class="stat-value" id="pageViews">0</div>
+                <div class="stat-label">Total de PageViews</div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>Eventos Rastreados</h3>
+                <div class="stat-value" id="totalEvents">0</div>
+                <div class="stat-label">Eventos Enviados</div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>Leads Capturados</h3>
+                <div class="stat-value" id="leadsCaptured">0</div>
+                <div class="stat-label">Formulários Preenchidos</div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>Inícios de Checkout</h3>
+                <div class="stat-value" id="checkouts">0</div>
+                <div class="stat-label">Iniciaram Compra</div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>Conversões</h3>
+                <div class="stat-value" id="conversions">0</div>
+                <div class="stat-label">Compras Realizadas</div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>Taxa de Conversão</h3>
+                <div class="stat-value" id="conversionRate">0%</div>
+                <div class="stat-label">Conversões/PageViews</div>
+            </div>
+        </div>
+
+        <div class="charts-section">
+            <div class="chart-container">
+                <h2 class="chart-title">Funil de Conversão</h2>
+                <div class="conversion-funnel">
+                    <div class="funnel-step">
+                        <div class="funnel-number" id="funnelPageViews">0</div>
+                        <div class="funnel-label">PageViews</div>
+                    </div>
+                    <div class="funnel-step">
+                        <div class="funnel-number" id="funnelLeads">0</div>
+                        <div class="funnel-label">Leads</div>
+                    </div>
+                    <div class="funnel-step">
+                        <div class="funnel-number" id="funnelCheckouts">0</div>
+                        <div class="funnel-label">Checkouts</div>
+                    </div>
+                    <div class="funnel-step">
+                        <div class="funnel-number" id="funnelPurchases">0</div>
+                        <div class="funnel-label">Compras</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h2 class="chart-title">Eventos por Página</h2>
+                <div class="page-tabs">
+                    <button class="page-tab active" onclick="showPageEvents('pag1')">Landing Page</button>
+                    <button class="page-tab" onclick="showPageEvents('text')">Sales Page</button>
+                    <button class="page-tab" onclick="showPageEvents('video')">Video VSL</button>
+                </div>
+                <table class="events-table" id="eventsTable">
+                    <thead>
+                        <tr>
+                            <th>Evento</th>
+                            <th>Quantidade</th>
+                            <th>Valor</th>
+                            <th>Última Ocorrência</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eventsTableBody">
+                        <!-- Dados serão inseridos via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="chart-container">
+                <h2 class="chart-title">Dados de UTM</h2>
+                <table class="events-table">
+                    <thead>
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Valor</th>
+                            <th>Ocorrências</th>
+                        </tr>
+                    </thead>
+                    <tbody id="utmTableBody">
+                        <!-- Dados serão inseridos via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div style="text-align: center; padding: 20px;">
+            <button class="refresh-btn" onclick="refreshDashboard()">🔄 Atualizar Dashboard</button>
+        </div>
+    </div>
+
+    <script>
+        // Dados simulados para demonstração
+        let dashboardData = {
+            pageViews: 0,
+            totalEvents: 0,
+            leadsCaptured: 0,
+            checkouts: 0,
+            conversions: 0,
+            events: {
+                pag1: {},
+                text: {},
+                video: {}
+            },
+            utmData: {}
+        };
+
+        // Função para atualizar o dashboard
+        function updateDashboard() {
+            // Simula dados de rastreamento
+            dashboardData.pageViews = Math.floor(Math.random() * 1000) + 100;
+            dashboardData.totalEvents = Math.floor(Math.random() * 5000) + 500;
+            dashboardData.leadsCaptured = Math.floor(Math.random() * 100) + 10;
+            dashboardData.checkouts = Math.floor(Math.random() * 50) + 5;
+            dashboardData.conversions = Math.floor(Math.random() * 20) + 2;
+
+            // Atualiza estatísticas
+            document.getElementById('pageViews').textContent = dashboardData.pageViews.toLocaleString();
+            document.getElementById('totalEvents').textContent = dashboardData.totalEvents.toLocaleString();
+            document.getElementById('leadsCaptured').textContent = dashboardData.leadsCaptured.toLocaleString();
+            document.getElementById('checkouts').textContent = dashboardData.checkouts.toLocaleString();
+            document.getElementById('conversions').textContent = dashboardData.conversions.toLocaleString();
+            
+            const conversionRate = ((dashboardData.conversions / dashboardData.pageViews) * 100).toFixed(2);
+            document.getElementById('conversionRate').textContent = conversionRate + '%';
+
+            // Atualiza funil
+            document.getElementById('funnelPageViews').textContent = dashboardData.pageViews.toLocaleString();
+            document.getElementById('funnelLeads').textContent = dashboardData.leadsCaptured.toLocaleString();
+            document.getElementById('funnelCheckouts').textContent = dashboardData.checkouts.toLocaleString();
+            document.getElementById('funnelPurchases').textContent = dashboardData.conversions.toLocaleString();
+
+            // Atualiza eventos da página atual
+            showPageEvents('pag1');
+            
+            // Atualiza dados UTM
+            updateUTMData();
+        }
+
+        // Função para mostrar eventos de uma página específica
+        function showPageEvents(page) {
+            // Remove classe active de todas as tabs
+            document.querySelectorAll('.page-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Adiciona classe active na tab clicada
+            event.target.classList.add('active');
+
+            // Dados simulados de eventos
+            const pageEvents = {
+                pag1: [
+                    { name: 'PageView', count: Math.floor(Math.random() * 500) + 100, value: 0, lastOccurrence: new Date().toLocaleString() },
+                    { name: 'ViewContent', count: Math.floor(Math.random() * 400) + 80, value: 0, lastOccurrence: new Date().toLocaleString() },
+                    { name: 'Lead', count: Math.floor(Math.random() * 50) + 10, value: 0, lastOccurrence: new Date().toLocaleString() },
+                    { name: 'headline_view', count: Math.floor(Math.random() * 300) + 60, value: 0, lastOccurrence: new Date().toLocaleString() },
+                    { name: 'testimonial_view', count: Math.floor(Math.random() * 200) + 40, value: 0, lastOccurrence: new Date().toLocaleString() }
+                ],
+                text: [
+                    { name: 'PageView', count: Math.floor(Math.random() * 300) + 60, value: 0, lastOccurrence: new Date().toLocaleString() },
+                    { name: 'ViewContent', count: Math.floor(Math.random() * 250) + 50, value: 0, lastOccurrence: new Date().toLocaleString() },
+                    { name: 'InitiateCheckout', count: Math.floor(Math.random() * 30) + 5, value: 0, lastOccurrence: new Date().toLocaleString() },
+                    { name: 'sales_headline_view', count: Math.floor(Math.random() * 200) + 40, value: 0, lastOccurrence: new Date().toLocaleString() },
+                    { name: 'guarantee_view', count: Math.floor(Math.random() * 150) + 30, value: 0, lastOccurrence: new Date().toLocaleString() }
+                ],
+                video: [
+                    { name: 'PageView', count: Math.floor(Math.random() * 200) + 40, value: 0, lastOccurrence: new Date().toLocaleString() },
+                    { name: 'ViewContent', count: Math.floor(Math.random() * 180) + 35, value: 0, lastOccurrence: new Date().toLocaleString() },
+                    { name: 'vsl_video_start', count: Math.floor(Math.random() * 120) + 25, value: 0, lastOccurrence: new Date().toLocaleString() },
+                    { name: 'vsl_video_complete', count: Math.floor(Math.random() * 80) + 15, value: 0, lastOccurrence: new Date().toLocaleString() },
+                    { name: 'InitiateCheckout', count: Math.floor(Math.random() * 20) + 3, value: 0, lastOccurrence: new Date().toLocaleString() }
+                ]
+            };
+
+            const tbody = document.getElementById('eventsTableBody');
+            tbody.innerHTML = '';
+
+            pageEvents[page].forEach(event => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${event.name}</td>
+                    <td>${event.count.toLocaleString()}</td>
+                    <td>R$ ${event.value.toFixed(2)}</td>
+                    <td>${event.lastOccurrence}</td>
+                `;
+            });
+        }
+
+        // Função para atualizar dados UTM
+        function updateUTMData() {
+            const utmData = {
+                'utm_source': { value: 'facebook', count: Math.floor(Math.random() * 500) + 100 },
+                'utm_medium': { value: 'cpc', count: Math.floor(Math.random() * 500) + 100 },
+                'utm_campaign': { value: 'brain_song_2024', count: Math.floor(Math.random() * 500) + 100 },
+                'utm_term': { value: 'memória', count: Math.floor(Math.random() * 300) + 60 },
+                'utm_content': { value: 'video_ad', count: Math.floor(Math.random() * 200) + 40 }
+            };
+
+            const tbody = document.getElementById('utmTableBody');
+            tbody.innerHTML = '';
+
+            Object.entries(utmData).forEach(([param, data]) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${param}</td>
+                    <td>${data.value}</td>
+                    <td>${data.count.toLocaleString()}</td>
+                `;
+            });
+        }
+
+        // Função para atualizar dashboard
+        function refreshDashboard() {
+            updateDashboard();
+            console.log('🔄 Dashboard atualizado');
+        }
+
+        // Inicializa o dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDashboard();
+            
+            // Atualiza automaticamente a cada 30 segundos
+            setInterval(updateDashboard, 30000);
+        });
+
+        // Simula eventos em tempo real
+        setInterval(() => {
+            // Simula novos eventos
+            dashboardData.pageViews += Math.floor(Math.random() * 5) + 1;
+            dashboardData.totalEvents += Math.floor(Math.random() * 10) + 2;
+            
+            if (Math.random() > 0.8) {
+                dashboardData.leadsCaptured += 1;
+            }
+            
+            if (Math.random() > 0.9) {
+                dashboardData.checkouts += 1;
+            }
+            
+            if (Math.random() > 0.95) {
+                dashboardData.conversions += 1;
+            }
+            
+            updateDashboard();
+        }, 5000);
+    </script>
+</body>
+</html> 
